@@ -1,4 +1,4 @@
-Everything's connected end to end now. Fast API serving real trend data and comparison results react rendering both pages against it worth a quick gut check while it's fresh. Try switching a few different countries on trends and try a real before after image pair, not identical ones on compare, just to see how the overlay looks with actual change detected rather than the zero diff test case. Whenever you're ready, this is a good point to commit. You've got a real working milestone. Just say the word git commit or however you want to phrase it, and I'll walk you through it step by step since you're still getting comfortable with Git"""
+"""
 ML: forest vs. non-forest image classifier.
 
 Dataset: EuroSAT RGB - real Sentinel-2 satellite image patches, labeled by

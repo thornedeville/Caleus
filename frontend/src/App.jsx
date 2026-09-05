@@ -1,20 +1,16 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
+import Nav from './components/Nav'
+import Trends from './pages/Trends'
+import Compare from './pages/Compare'
 
 function App() {
-  const [status, setStatus] = useState('Loading...')
-
-  useEffect(() => {
-    fetch('http://localhost:8000/api/hello')
-      .then(res => res.json())
-      .then(data => setStatus(data.message))
-      .catch(() => setStatus('Could not reach the server'))
-  }, [])
+  const [activeTab, setActiveTab] = useState('Trends')
 
   return (
-    <main>
-      <h1>Caleus</h1>
-      <p>{status}</p>
-    </main>
+    <>
+      <Nav active={activeTab} onChange={setActiveTab} />
+      {activeTab === 'Trends' ? <Trends /> : <Compare />}
+    </>
   )
 }
 
