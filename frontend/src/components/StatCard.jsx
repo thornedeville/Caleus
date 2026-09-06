@@ -1,8 +1,18 @@
-function StatCard({ label, value }) {
+import { MiniBarsIcon } from './icons'
+
+function StatCard({ label, value, change }) {
   return (
     <div style={styles.card}>
-      <p style={styles.label}>{label}</p>
+      <div style={styles.topRow}>
+        <p className="eyebrow">{label}</p>
+        <MiniBarsIcon size={20} />
+      </div>
       <h3 style={styles.value}>{value}</h3>
+      {change && (
+        <span className={`change-badge ${change.direction === 'down' ? 'good' : 'bad'}`}>
+          {change.direction === 'down' ? '↓' : '↑'} {change.percent}% vs last year
+        </span>
+      )}
     </div>
   )
 }
@@ -14,13 +24,17 @@ const styles = {
     borderRadius: 'var(--radius)',
     padding: '18px 20px',
     minWidth: '160px',
+    flex: 1,
   },
-  label: {
-    fontSize: '13px',
-    marginBottom: '8px',
+  topRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: '10px',
   },
   value: {
     fontSize: '24px',
+    marginBottom: '8px',
   },
 }
 

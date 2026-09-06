@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { UploadIcon } from '../components/icons'
 
 const API_BASE = 'http://localhost:8000'
 
@@ -32,6 +33,10 @@ function Compare() {
 
   return (
     <div style={styles.page}>
+      <div style={styles.topBar}>
+        <p className="eyebrow">Caleus / Compare</p>
+      </div>
+
       <div>
         <h1 style={styles.title}>Compare satellite images</h1>
         <p>Upload two images of the same location, taken at different times.</p>
@@ -52,12 +57,22 @@ function Compare() {
 
       {error && <p style={{ color: 'var(--loss)' }}>{error}</p>}
 
+      {loading && (
+        <div className="skeleton" style={{ width: '100%', height: '360px', borderRadius: 'var(--radius)' }} />
+      )}
+
+      {!loading && !result && !error && (
+        <div style={styles.emptyState}>
+          <p>Choose two images above and run a comparison to see the change overlay here.</p>
+        </div>
+      )}
+
       {result && (
         <div style={styles.resultCard}>
           <img src={result.overlay} alt="Change overlay" style={styles.overlayImage} />
           <div style={styles.statBadge}>
-            <p style={{ marginBottom: '4px' }}>Forest lost</p>
-            <h3 style={{ fontSize: '22px' }}>{result.percentLost}%</h3>
+            <p className="eyebrow" style={{ marginBottom: '4px' }}>Forest lost</p>
+            <h3 style={{ fontSize: '22px', color: 'var(--loss)' }}>{result.percentLost}%</h3>
           </div>
         </div>
       )}
@@ -68,7 +83,10 @@ function Compare() {
 function UploadSlot({ label, file, onFile }) {
   return (
     <label style={styles.uploadSlot}>
-      <span style={{ fontWeight: 500, marginBottom: '6px' }}>{label}</span>
+      <div style={{ color: 'var(--text)', marginBottom: '4px' }}>
+        <UploadIcon size={22} />
+      </div>
+      <span style={{ fontWeight: 500, marginBottom: '4px' }}>{label}</span>
       <span style={{ fontSize: '13px' }}>
         {file ? file.name : 'Click to choose a file'}
       </span>
@@ -87,12 +105,14 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     gap: '24px',
-    padding: '32px',
-    maxWidth: '900px',
-    margin: '0 auto',
+    padding: '28px 36px',
+    maxWidth: '1080px',
+  },
+  topBar: {
+    marginBottom: '-8px',
   },
   title: {
-    fontSize: '28px',
+    fontSize: '26px',
     marginBottom: '6px',
   },
   uploadRow: {
@@ -114,13 +134,19 @@ const styles = {
   },
   button: {
     alignSelf: 'flex-start',
-    padding: '12px 28px',
+    padding: '11px 26px',
     borderRadius: 'var(--radius-pill)',
     border: 'none',
-    background: 'var(--text)',
-    color: 'var(--surface)',
+    background: 'var(--active-bg)',
+    color: 'var(--active-text)',
     fontSize: '14px',
     fontWeight: 500,
+  },
+  emptyState: {
+    border: '1px dashed var(--border)',
+    borderRadius: 'var(--radius)',
+    padding: '48px',
+    textAlign: 'center',
   },
   resultCard: {
     position: 'relative',
@@ -128,11 +154,10 @@ const styles = {
     border: '1px solid var(--border)',
     borderRadius: 'var(--radius)',
     padding: '16px',
-    boxShadow: 'var(--shadow)',
   },
   overlayImage: {
     width: '100%',
-    borderRadius: '10px',
+    borderRadius: '8px',
     display: 'block',
   },
   statBadge: {
@@ -143,7 +168,7 @@ const styles = {
     border: '1px solid var(--border)',
     borderRadius: 'var(--radius)',
     padding: '12px 18px',
-    boxShadow: 'var(--shadow)',
+    boxShadow: 'var(--shadow-lifted)',
   },
 }
 

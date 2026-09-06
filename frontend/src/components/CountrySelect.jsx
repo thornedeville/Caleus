@@ -1,23 +1,41 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 function CountrySelect({ countries, value, onSelect }) {
-  const [query, setQuery] = useState('')
+  const [text, setText] = useState(value || '')
   const [open, setOpen] = useState(false)
 
-  const filtered = query
-    ? countries.filter(c => c.toLowerCase().includes(query.toLowerCase()))
+  // keep the box in sync when the selected country changes from outside
+  useEffect(() => {
+    setText(value || '')
+  }, [value])
+
+  const filtered = text
+    ? countries.filter(c => c.toLowerCase().includes(text.toLowerCase()))
     : countries
+
+  const handleSelect = country => {
+    onSelect(country)
+    setText(country)
+    setOpen(false)
+  }
+
+  const handleBlur = () => {
+    setTimeout(() => {
+      setOpen(false)
+      setText(value || '') // nothing was picked, so snap back to the real selection
+    }, 150)
+  }
 
   return (
     <div style={styles.wrapper}>
       <input
-        value={query || value || ''}
+        value={text}
         onChange={e => {
-          setQuery(e.target.value)
+          setText(e.target.value)
           setOpen(true)
         }}
         onFocus={() => setOpen(true)}
-        onBlur={() => setTimeout(() => setOpen(false), 150)}
+        onBlur={handleBlur}
         placeholder="Search for a country"
         style={styles.input}
       />
@@ -25,15 +43,7 @@ function CountrySelect({ countries, value, onSelect }) {
       {open && filtered.length > 0 && (
         <div style={styles.list}>
           {filtered.slice(0, 8).map(country => (
-            <div
-              key={country}
-              style={styles.option}
-              onMouseDown={() => {
-                onSelect(country)
-                setQuery('')
-                setOpen(false)
-              }}
-            >
+            <div key={country} style={styles.option} onMouseDown={() => handleSelect(country)}>
               {country}
             </div>
           ))}
@@ -50,8 +60,8 @@ const styles = {
   },
   input: {
     width: '100%',
-    padding: '10px 14px',
-    borderRadius: 'var(--radius-pill)',
+    padding: '9px 14px',
+    borderRadius: '8px',
     border: '1px solid var(--border)',
     fontSize: '14px',
     outline: 'none',
@@ -63,13 +73,13 @@ const styles = {
     right: 0,
     background: 'var(--surface)',
     border: '1px solid var(--border)',
-    borderRadius: '10px',
-    boxShadow: 'var(--shadow)',
+    borderRadius: '8px',
+    boxShadow: 'var(--shadow-lifted)',
     zIndex: 10,
     overflow: 'hidden',
   },
   option: {
-    padding: '10px 14px',
+    padding: '9px 14px',
     fontSize: '14px',
     cursor: 'pointer',
   },

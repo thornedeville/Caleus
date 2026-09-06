@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import CountrySelect from '../components/CountrySelect'
-import LineChart from '../components/LineChart'
+import BarChart from '../components/BarChart'
 import StatCard from '../components/StatCard'
 
 const API_BASE = 'http://localhost:8000'
@@ -37,8 +37,14 @@ function Trends() {
       .finally(() => setLoading(false))
   }, [country])
 
+  const yearlyChange = getYearlyChange(trend?.series)
+
   return (
     <div style={styles.page}>
+      <div style={styles.topBar}>
+        <p className="eyebrow">Caleus / Trends</p>
+      </div>
+
       <div style={styles.headerRow}>
         <div>
           <h1 style={styles.title}>Deforestation trends</h1>
@@ -49,19 +55,48 @@ function Trends() {
 
       {error && <p style={{ color: 'var(--loss)' }}>{error}</p>}
 
-      <div style={styles.chartCard}>
-        {loading ? <p>Loading chart...</p> : <LineChart series={trend?.series} />}
+      <div style={styles.statRow}>
+        {loading || !trend?.stats
+          ? Array.from({ length: 4 }).map((_, index) => (
+              <div key={index} className="skeleton" style={{ height: '92px', flex: 1 }} />
+            ))
+          : trend.stats.map((stat, index) => (
+              <StatCard
+                key={stat.label}
+                label={stat.label}
+                value={stat.value}
+                change={index === 1 ? yearlyChange : null}
+              />
+            ))}
       </div>
 
-      {trend?.stats && (
-        <div style={styles.statRow}>
-          {trend.stats.map(stat => (
-            <StatCard key={stat.label} label={stat.label} value={stat.value} />
-          ))}
+      <div style={styles.chartCard}>
+        <div style={styles.chartHeader}>
+          <p className="eyebrow">Annual loss</p>
+          <span style={{ fontSize: '13px', fontWeight: 500 }}>{country}</span>
         </div>
-      )}
+
+        {loading ? (
+          <div className="skeleton" style={{ width: '100%', height: '240px' }} />
+        ) : (
+          <BarChart series={trend?.series} />
+        )}
+      </div>
     </div>
   )
+}
+
+function getYearlyChange(series) {
+  if (!series || series.length < 2) return null
+  const last = series[series.length - 1]
+  const prev = series[series.length - 2]
+  if (prev.value === 0) return null
+
+  const percent = (((last.value - prev.value) / prev.value) * 100).toFixed(1)
+  return {
+    direction: last.value < prev.value ? 'down' : 'up',
+    percent: Math.abs(percent),
+  }
 }
 
 const styles = {
@@ -69,9 +104,11 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     gap: '24px',
-    padding: '32px',
-    maxWidth: '900px',
-    margin: '0 auto',
+    padding: '28px 36px',
+    maxWidth: '1080px',
+  },
+  topBar: {
+    marginBottom: '-8px',
   },
   headerRow: {
     display: 'flex',
@@ -81,20 +118,25 @@ const styles = {
     flexWrap: 'wrap',
   },
   title: {
-    fontSize: '28px',
+    fontSize: '26px',
     marginBottom: '6px',
+  },
+  statRow: {
+    display: 'flex',
+    gap: '16px',
+    flexWrap: 'wrap',
   },
   chartCard: {
     background: 'var(--surface)',
     border: '1px solid var(--border)',
     borderRadius: 'var(--radius)',
     padding: '24px',
-    boxShadow: 'var(--shadow)',
   },
-  statRow: {
+  chartHeader: {
     display: 'flex',
-    gap: '16px',
-    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: '16px',
   },
 }
 
